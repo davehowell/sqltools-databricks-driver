@@ -2,13 +2,25 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "database": {
-      "title": "Database file",
+    "host": {
+      "title": "Databricks host similar to 'https://*.cloud.databricks.com'",
       "type": "string",
-      "minLength": 1
+      "minLength": 30
+    },
+    "path": {
+      "title": "The URL path to a Databricks SQL Endpoint e.g. '/sql/1.0/endpoints/****************'",
+      "type": "string",
+      "minLength": 20
+    },
+    "token": {
+      "title": "Your Databricks PAT (personal access token) e.g. 'dapi********************************'",
+      "type": "string",
+      "minLength": 4
     }
   },
   "required": [
-    "database"
+    "host",
+    "path",
+    "token"
   ]
 }
