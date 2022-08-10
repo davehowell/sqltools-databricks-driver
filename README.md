@@ -62,6 +62,15 @@ Create an issue in this Github repo
 
 Note: the Databricks Driver depends on [databricks-sql-nodejs](https://github.com/databricks/databricks-sql-nodejs) which has examples and more docs that are useful for development purposes.
 
+* Scripts
+```sh
+# lint (es-lint)
+yarn lint
+
+# format (prettier)
+yarn format
+```
+
 ## Changelog
 
 ### 0.0.1

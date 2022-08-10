@@ -23,9 +23,5 @@
       "default": ""
     }
   },
-  "required": [
-    "host",
-    "path",
-    "token"
-  ]
+  "required": ["host", "path", "token"]
 }

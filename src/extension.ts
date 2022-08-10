@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { IExtension, IExtensionPlugin, IDriverExtensionApi } from '@sqltools/types';
 import { ExtensionContext } from 'vscode';
 import { DRIVER_ALIASES } from './constants';
-const { publisher, name, displayName } = require('../package.json');
+import { publisher, name, displayName } from '../package.json';
 
 export async function activate(extContext: ExtensionContext): Promise<IDriverExtensionApi> {
   const sqltools = vscode.extensions.getExtension<IExtension>('mtxr.sqltools');
@@ -32,7 +32,9 @@ export async function activate(extContext: ExtensionContext): Promise<IDriverExt
           .set(`driver/${value}/connection-schema`, extContext.asAbsolutePath('connection.schema.json'));
         extension.resourcesMap().set(`driver/${value}/ui-schema`, extContext.asAbsolutePath('ui.schema.json'));
       });
-      await extension.client.sendRequest('ls/RegisterPlugin', { path: extContext.asAbsolutePath('out/ls/plugin.js') });
+      await extension.client.sendRequest('ls/RegisterPlugin', {
+        path: extContext.asAbsolutePath('out/ls/plugin.js'),
+      });
     },
   };
   api.registerPlugin(plugin);
@@ -75,4 +77,5 @@ export async function activate(extContext: ExtensionContext): Promise<IDriverExt
   };
 }
 
+/* eslint-disable @typescript-eslint/no-empty-function */
 export function deactivate() {}
