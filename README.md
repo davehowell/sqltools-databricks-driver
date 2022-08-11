@@ -1,29 +1,33 @@
 # SQLTools Databricks Driver
 
-This package depends on the vscode-sqltools extension.
+This package depends on the awesome vscode-sqltools extension, [sponsor that project](https://github.com/mtxr/vscode-sqltools).
 
-For installation use Extensions within VSCode, OR the VSCode marketplace.
+For installation use Extensions within VSCode, or get it from the VSCode marketplace.
 
 ## About
 [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) is a fantastic extension that turns VSCode into a feature-rich SQL IDE client. It already supports connections to SQLite, PostgreSQL, MySQL, MSSQL, Snowflake, Redshift, Caddandra, Trino, Teradata and others.
 
-The purpose of this Databricks Driver for SQLTools is to extend the capability of SQLTools to support connecting to Databricks SQL Warehouses (SQL endpoints). It enables browsing the metadata catalog, and support the editing and running of adhoc and source-controlled `*.sql` files directly with Databricks.
+The purpose of this Databricks Driver for SQLTools is to extend the capability of SQLTools to support connecting to Databricks SQL Warehouses (formerly called SQL endpoints). It enables browsing the metadata catalog, and supports the editing and running of adhoc and source-controlled `*.sql` files directly with Databricks so they can be tested and source controlled in place.
+
 
 It is not intended to use for connecting with other Databricks cluster types.
 
-There is an existing excellent [Databricks VSCode](https://marketplace.visualstudio.com/items?itemName=paiqo.databricks-vscode) extension that utilizes Jupyter notebooks to simulate the Databricks web console experience in your local IDE. That is useful for working with notebook files as well as working with clusters, jobs and other admin tasks. This is not intented to replace that extension or compete with that functionality.
+## Alternatives
+The Databricks SQL UI within the Databricks webconsole is a great tool for this purpose and you should consider if that suits your needs.
+
+The existing [Databricks VSCode](https://marketplace.visualstudio.com/items?itemName=paiqo.databricks-vscode) extension is also excellent. It utilizes Jupyter notebooks to simulate the Databricks web notebook experience in your local IDE. That is useful for working with notebook files as well as working with clusters, jobs and other admin tasks. This is not intented to replace that extension or compete with that functionality.
 
 ## Requirements
 1. A **Databricks account** and workspace with Databricks SQL available
-    1. Requires a "Premium" or higher pricing plan, "Standard" does not support SQL Warehouses nor tokens.
+    1. Requires a "Premium" or higher pricing plan, "Standard" supports neither SQL Warehouses nor tokens.
 2. A personal access **token** (PAT) created in Databricks for your user
     1. PAT feature may need to be enabled see [tokens](https://docs.databricks.com/administration-guide/access-control/tokens.html)
 3. A **Databricks SQL Warehouse** see [Create a SQL warehouse](https://docs.databricks.com/sql/admin/sql-endpoints.html#create-a-sql-warehouse)
     1. Ensure the SQL Warehouse is running
-    2. Get the connection details for that SQL Warehouse
+    2. Note the connection details for that SQL Warehouse
     1. You will need the `host` and `path` as well as your PAT `token` created earlier
 4. VSCode
-5. SQLTools extension for VSCode
+5. [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) extension for VSCode
 
 ## Setup
 
@@ -76,3 +80,22 @@ yarn format
 ### 0.0.1
 
 - First working version
+
+
+#### notes
+```ts
+import PromisePool from "@supercharge/promise-pool"
+(async function () {
+    try {
+    const list = await getSomeList();
+    const { results, errors } = await PromisePool.withConcurrency(2)
+        .for(listItems)
+        .process(async (data) => {
+        return await getListItem(data.url);
+    });
+    console.log(results.map((p) => p.name));
+    } catch (e) {
+        console.error(e)
+    }
+})();
+```
