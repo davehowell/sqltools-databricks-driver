@@ -19,12 +19,9 @@ type DBSQLOptions = {
 export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOptions> implements IConnectionDriver {
   queries = queries;
 
-  /**
-   *
-   */
-  session: Promise<any>;
+  declare connection: Promise<DBSQLClient>
 
-  public async openConnection() {
+  public async open(): Promise<DBSQLClient>{
     if (this.connection) {
       return this.connection;
     }
@@ -38,6 +35,12 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
         message: 'Missing config info. Ensure host, path, and token are set in connection details.',
       });
     }
+    if (clientConfig.host.toUpperCase().startsWith('http')) {
+      return Promise.reject({
+        message: `Incorrect Host config. Try removing the https:// from ${clientConfig.host}`,
+      });
+    }
+
     try {
       const client = new DBSQLClient();
       const conn = await client.connect(clientConfig);
@@ -46,21 +49,6 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
       return Promise.reject(error);
     }
     return this.connection;
-  }
-
-  public async open() {
-    if (this.session) {
-      return this.session;
-    }
-    try {
-      await this.openConnection()
-      const conn = await this.connection;
-      const sess = await conn.openSession()
-      this.session = Promise.resolve(sess)
-    } catch (error) {
-      return Promise.reject(error);
-    }
-    return this.session;
   }
 
 
