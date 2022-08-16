@@ -4,7 +4,7 @@
     "ui:widget": "text",
     "ui:autofocus": true,
     "ui:emptyValue": "",
-    "ui:autocomplete": "e.g. https://<***>.cloud.databricks.com"
+    "ui:autocomplete": "e.g. <***>.cloud.databricks.com"
   },
   "path": {
     "ui:widget": "text",

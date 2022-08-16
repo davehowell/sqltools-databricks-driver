@@ -8,7 +8,7 @@
       "title": "Server hostname - URL of your Databricks Workspace",
       "type": "string",
       "minLength": 30,
-      "default": "e.g. https://*.cloud.databricks.com"
+      "default": "e.g. *.cloud.databricks.com"
     },
     "path": {
       "title": "HTTP path - a Databricks SQL Warehouse (Endpoint)",
