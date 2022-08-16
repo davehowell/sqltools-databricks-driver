@@ -140,6 +140,15 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     console.log("Databricks connection test successful");
   };
 
+
+  private async getColumns(parent: NSDatabase.ITable): Promise<NSDatabase.IColumn[]> {
+    const results = await this.queryResults(this.queries.fetchColumns(parent));
+    return results.map(col => ({
+      ...col,
+      iconName: col.isPk ? 'pk' : (col.isFk ? 'fk' : null),
+      childType: ContextValue.NO_CHILD,
+      table: parent
+    }));
   }
 
   /**
@@ -150,82 +159,24 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     switch (item.type) {
       case ContextValue.CONNECTION:
       case ContextValue.CONNECTED_CONNECTION:
-        return <MConnectionExplorer.IChildItem[]>[
-          {
-            label: 'Tables',
-            type: ContextValue.RESOURCE_GROUP,
-            iconId: 'folder',
-            childType: ContextValue.TABLE,
-          },
-          {
-            label: 'Views',
-            type: ContextValue.RESOURCE_GROUP,
-            iconId: 'folder',
-            childType: ContextValue.VIEW,
-          },
-        ];
+        return this.queryResults(this.queries.fetchDatabases());
       case ContextValue.TABLE:
       case ContextValue.VIEW:
-        let i = 0;
-        return <NSDatabase.IColumn[]>[
-          {
-            database: 'fakedb',
-            label: `column${i++}`,
-            type: ContextValue.COLUMN,
-            dataType: 'faketype',
-            schema: 'fakeschema',
-            childType: ContextValue.NO_CHILD,
-            isNullable: false,
-            iconName: 'column',
-            table: parent,
-          },
-          {
-            database: 'fakedb',
-            label: `column${i++}`,
-            type: ContextValue.COLUMN,
-            dataType: 'faketype',
-            schema: 'fakeschema',
-            childType: ContextValue.NO_CHILD,
-            isNullable: false,
-            iconName: 'column',
-            table: parent,
-          },
-          {
-            database: 'fakedb',
-            label: `column${i++}`,
-            type: ContextValue.COLUMN,
-            dataType: 'faketype',
-            schema: 'fakeschema',
-            childType: ContextValue.NO_CHILD,
-            isNullable: false,
-            iconName: 'column',
-            table: parent,
-          },
-          {
-            database: 'fakedb',
-            label: `column${i++}`,
-            type: ContextValue.COLUMN,
-            dataType: 'faketype',
-            schema: 'fakeschema',
-            childType: ContextValue.NO_CHILD,
-            isNullable: false,
-            iconName: 'column',
-            table: parent,
-          },
-          {
-            database: 'fakedb',
-            label: `column${i++}`,
-            type: ContextValue.COLUMN,
-            dataType: 'faketype',
-            schema: 'fakeschema',
-            childType: ContextValue.NO_CHILD,
-            isNullable: false,
-            iconName: 'column',
-            table: parent,
-          },
+      case ContextValue.MATERIALIZED_VIEW:
+        return this.getColumns(item as NSDatabase.ITable);
+      case ContextValue.DATABASE:
+        return <MConnectionExplorer.IChildItem[]>[
+          { label: 'Schemas', type: ContextValue.RESOURCE_GROUP, iconId: 'folder', childType: ContextValue.SCHEMA },
         ];
       case ContextValue.RESOURCE_GROUP:
         return this.getChildrenForGroup({ item, parent });
+      case ContextValue.SCHEMA:
+        return <MConnectionExplorer.IChildItem[]>[
+          { label: 'Tables', type: ContextValue.RESOURCE_GROUP, iconId: 'folder', childType: ContextValue.TABLE },
+          { label: 'Views', type: ContextValue.RESOURCE_GROUP, iconId: 'folder', childType: ContextValue.VIEW },
+          { label: 'Materialized Views', type: ContextValue.RESOURCE_GROUP, iconId: 'folder', childType: ContextValue.MATERIALIZED_VIEW },
+          { label: 'Functions', type: ContextValue.RESOURCE_GROUP, iconId: 'folder', childType: ContextValue.FUNCTION },
+        ];
     }
     return [];
   }

@@ -10,12 +10,15 @@ WHERE
   TABLE_NAME = '${p => p.label}'
   AND TABLE_CATALOG = '${p => p.database}'
   AND TABLE_SCHEMA = '${p => p.schema}'`;
- * 
+ *
  */
+
+const fetchDatabases: IBaseQueries['fetchDatabases'] = queryFactory`
+SHOW DATABASES;
+`;
+
 const describeTable: IBaseQueries['describeTable'] = queryFactory`
-  SELECT C.*
-  FROM pragma_table_info('${(p) => p.label}') AS C
-  ORDER BY C.cid ASC
+DESCRIBE TABLE ${(p) => p.label}
 `;
 
 const fetchColumns: IBaseQueries['fetchColumns'] = queryFactory`
@@ -90,6 +93,7 @@ LIMIT ${(p) => p.limit || 100}
 `;
 
 export default {
+  fetchDatabases,
   describeTable,
   countRecords,
   fetchColumns,
