@@ -1,6 +1,6 @@
 {
   "name": "sqltools-databricks-driver",
-  "displayName": "Databricks Driver for SQLTools",
+  "displayName": "Databricks",
   "description": "A Databricks driver for the SQLTools VSCode extension",
   "version": "0.0.1",
   "engines": {
@@ -69,6 +69,7 @@
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "concurrently": "^7.3.0",
+    "esbuild": "^0.15.3",
     "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
