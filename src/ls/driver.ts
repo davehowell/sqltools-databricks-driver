@@ -66,39 +66,64 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     this.connection = null;
   }
 
+
   public query: typeof AbstractDriver['prototype']['query'] = async (query, opt = {}) => {
-    const session = await this.open();
+
+    const messages = [];
     const queries = QueryParser.parse(query.toString()).filter(Boolean);
-    /**
-     *
-     *  queries could be multiple, parse them with ;
-     *  e.g. https://github.com/cloudspannerecosystem/sqltools-cloud-spanner-driver/blob/main/src/ls/parser.ts
-     * or https://github.com/mtxr/vscode-sqltools/blob/dev/packages/util/query/parse.ts
-     *
-     * https://github.com/SAP/sap-hana-driver-for-sqltools/blob/master/src/ls/driver.ts
-     * declare a DatabricksSession interface that includes those methods & properties -
-     * public open(): Promise<DatabricksSession> { ...}
-     *
-     */
+    var session: IHiveSession = null
 
-
-
-
-    const queriesResults = await session.query(queries);
-
-    const resultsAgg: NSDatabase.IResult[] = [];
-    queriesResults.forEach((queryResult) => {
-      resultsAgg.push({
-        cols: Object.keys(queryResult[0]),
-        connId: this.getId(),
-        messages: [{ date: new Date(), message: `Query ok with ${queriesResults.length} results` }],
-        results: queryResult,
-        query: queries.toString(),
-        requestId: opt.requestId,
-        resultId: generateId(),
+    try {
+      const conn = await this.open()
+      session = await conn.openSession();
+      //subscribe to client connection's potential async network errors
+      conn.on('error', (error) => {
+        messages.push({message: error, date: new Date()})
       });
-    });
-    return resultsAgg;
+
+      const resultsAgg: NSDatabase.IResult[] = await Promise.all(
+        queries.map(async (qry) => {
+          const queryOperation = await session.executeStatement(qry);
+          await utils.waitUntilReady(queryOperation, false);
+          await utils.fetchAll(queryOperation);
+          //const status = await queryOperation.status(false) //TODO: add to messages, getInfo()
+
+          await queryOperation.close();
+          const queryResult = utils.getResult(queryOperation).getValue();
+
+          return {
+            cols: Object.keys(queryResult[0]),
+            connId: this.getId(),
+            messages: [{ date: new Date(), message: `Query ok with ${queryResult.length} results` }],
+            results: queryResult,
+            query: qry.toString(),
+            requestId: opt.requestId,
+            resultId: generateId(),
+          }
+        })
+      )
+      return resultsAgg;
+    } catch (err) {
+      return [<NSDatabase.IResult>{
+        resultId: generateId(),
+        requestId: opt.requestId,
+        connId: this.getId(),
+        error: true,
+        rawError: err,
+        results: [],
+        cols: [],
+        query,
+        messages: [
+          this.prepareMessage ([
+            (err && err.message || err),
+            err && err.routine === 'scanner_yyerror' && err.position ? `at character ${err.position}` : undefined
+          ].filter(Boolean).join(' '))
+        ],
+      }];
+    } finally {
+      session && await session.close()
+      await this.close()
+    }
   };
 
   public async testConnection() {
