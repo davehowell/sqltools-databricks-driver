@@ -1,9 +1,12 @@
 import AbstractDriver from '@sqltools/base-driver';
-import queries from './queries';
 import { IConnectionDriver, MConnectionExplorer, NSDatabase, ContextValue, Arg0 } from '@sqltools/types';
+import { DBSQLClient } from '@databricks/sql';
+
+import queries from './queries';
 import QueryParser from './parser';
 import { v4 as generateId } from 'uuid';
-import { DBSQLClient } from '@databricks/sql';
+import IHiveSession from '@databricks/sql/dist/contracts/IHiveSession';
+//import { DBSQLSession } from './interfaces';
 
 const utils = DBSQLClient.utils;
 
