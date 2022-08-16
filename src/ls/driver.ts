@@ -101,13 +101,20 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     return resultsAgg;
   };
 
-  /** if you need a different way to test your connection, you can set it here.
-   * Otherwise by default we open and close the connection only
-   */
   public async testConnection() {
-    await this.open();
-    await this.query('SELECT 1', {});
-    await this.close()
+    console.log("Executing connection test");
+    try {
+      await this.open();
+      await this.query('SELECT 1', {});
+      await this.close();
+    } catch (e) {
+      console.error("Connection test failed with message");
+      console.error(e);
+      throw "Connection test failed.";
+    }
+    console.log("Databricks connection test successful");
+  };
+
   }
 
   /**
