@@ -83,28 +83,24 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
   }
 
   public query: typeof AbstractDriver['prototype']['query'] = async (query, opt = {}) => {
-    // can we add optional args then unpack/intercept them? Smuggling. Probably not idiomatic typescript
-    //const {runAsync, confOverlay, queryTimeout, ...opts } = opt as ExecuteStatementOptions;
 
     const resultsAgg: NSDatabase.IResult[] = [];
-
+    var messages: NSDatabase.IResult["messages"] = [];
+    try {
     const queries = QueryParser.parse(query.toString()).filter(Boolean);
-
     const conn = await this.open();
-
-    const session = await this.openSession(conn);
-
-    for (const qry of queries) {
-      const messages = [];
       //subscribe to client connection's potential async network errors
       conn.on('error', (error) => {
         messages.push({ message: error, date: new Date() });
       });
-      try {
+      const session = await this.openSession(conn);
+
+      for (const qry of queries) {
+        messages = []
         const queryOperation = await session.executeStatement(qry);
         await utils.waitUntilReady(queryOperation, false);
         await utils.fetchAll(queryOperation);
-        //const status = await queryOperation.status(false) //TODO: add to messages, getInfo()
+        //const status = await queryOperation.status(false) //TODO: should we add to messages, using getInfo() ?
 
         await queryOperation.close();
         const queryResult = utils.getResult(queryOperation).getValue();
@@ -119,6 +115,7 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
           requestId: opt.requestId,
           resultId: generateId(),
         });
+      }
       } catch (err) {
         messages.push(
           this.prepareMessage(
@@ -128,7 +125,7 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
             ]
               .filter(Boolean)
               .join(' '),
-          ),
+          )
         );
         resultsAgg.push(<NSDatabase.IResult>{
           resultId: generateId(),
@@ -141,9 +138,9 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
           query,
           messages: messages,
         });
+    } finally {
+      await this.close()
       }
-    }
-    session && (await session.close());
     return resultsAgg;
   };
 
@@ -152,11 +149,12 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     try {
       await this.open();
       await this.query('SELECT 1', {runAsync: true});
-      await this.close();
     } catch (e) {
       console.error('Connection test failed with message');
       console.error(e);
       throw 'Connection test failed.';
+    } finally {
+      await this.close();
     }
     console.log('Databricks connection test successful');
   }
