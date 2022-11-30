@@ -1,14 +1,27 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Databricks SQL Endpoint connection details",
+  "description": "Does not support basic user/pass authentication, use a personal access token see https://docs.databricks.com/dev-tools/api/latest/authentication.html#generate-a-personal-access-token",
   "type": "object",
   "properties": {
-    "database": {
-      "title": "Database file",
+    "host": {
+      "title": "Server hostname - URL of your Databricks Workspace",
       "type": "string",
-      "minLength": 1
+      "minLength": 30,
+      "default": "e.g. *.cloud.databricks.com"
+    },
+    "path": {
+      "title": "HTTP path - a Databricks SQL Warehouse (Endpoint)",
+      "type": "string",
+      "minLength": 20,
+      "default": "e.g. /sql/1.0/endpoints/****************"
+    },
+    "token": {
+      "title": "Token - e.g. dapi********************************",
+      "type": "string",
+      "minLength": 4,
+      "default": ""
     }
   },
-  "required": [
-    "database"
-  ]
+  "required": ["host", "path", "token"]
 }

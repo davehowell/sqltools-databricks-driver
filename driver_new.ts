@@ -94,14 +94,14 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
 
     const session = await this.openSession(conn);
 
-    for (const qry of queries) {
+    for (const qry in queries) {
       const messages = [];
       //subscribe to client connection's potential async network errors
       conn.on('error', (error) => {
         messages.push({ message: error, date: new Date() });
       });
       try {
-        const queryOperation = await session.executeStatement(qry);
+        const queryOperation = await session.executeStatement(qry, {runAsync: true});
         await utils.waitUntilReady(queryOperation, false);
         await utils.fetchAll(queryOperation);
         //const status = await queryOperation.status(false) //TODO: add to messages, getInfo()
@@ -141,10 +141,11 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
           query,
           messages: messages,
         });
+      } finally {
+        session && (await session.close());
       }
+      return resultsAgg;
     }
-    session && (await session.close());
-    return resultsAgg;
   };
 
   public async testConnection() {
