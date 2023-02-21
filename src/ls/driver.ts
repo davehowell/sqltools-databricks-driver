@@ -87,8 +87,8 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
     const resultsAgg: NSDatabase.IResult[] = [];
     var messages: NSDatabase.IResult["messages"] = [];
     try {
-    const queries = QueryParser.parse(query.toString()).filter(Boolean);
-    const conn = await this.open();
+      const queries = QueryParser.parse(query.toString()).filter(Boolean);
+      const conn = await this.open();
       //subscribe to client connection's potential async network errors
       conn.on('error', (error) => {
         messages.push({ message: error, date: new Date() });
@@ -116,8 +116,8 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
           resultId: generateId(),
         });
       }
-      } catch (err) {
-        messages.push(
+    } catch (err) {
+      messages.push(
           this.prepareMessage(
             [
               (err && err.message) || err,
@@ -126,21 +126,21 @@ export default class DatabricksSQL extends AbstractDriver<DBSQLClient, DBSQLOpti
               .filter(Boolean)
               .join(' '),
           )
-        );
-        resultsAgg.push(<NSDatabase.IResult>{
-          resultId: generateId(),
-          requestId: opt.requestId,
-          connId: this.getId(),
-          error: true,
-          rawError: err,
-          results: [],
-          cols: [],
-          query,
-          messages: messages,
-        });
+      );
+      resultsAgg.push(<NSDatabase.IResult>{
+        resultId: generateId(),
+        requestId: opt.requestId,
+        connId: this.getId(),
+        error: true,
+        rawError: err,
+        results: [],
+        cols: [],
+        query,
+        messages: messages,
+      });
     } finally {
       await this.close()
-      }
+    }
     return resultsAgg;
   };
 
