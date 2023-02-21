@@ -1,3 +1,16 @@
+ ⚠️   _This project is now redundant - use this official project https://github.com/databricks/sqltools-databricks-driver/_ 
+
+
+
+
+
+
+
+
+
+
+
+
 # SQLTools Databricks Driver
 
 This package depends on the awesome vscode-sqltools extension, [sponsor that project](https://github.com/mtxr/vscode-sqltools).
