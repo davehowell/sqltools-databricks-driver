@@ -1,4 +1,20 @@
 {
-  "ui:order": ["database"],
-  "database": { "ui:widget": "file" }
+  "ui:order": ["host", "path", "token"],
+  "host": {
+    "ui:widget": "text",
+    "ui:autofocus": true,
+    "ui:emptyValue": "",
+    "ui:autocomplete": "e.g. <***>.cloud.databricks.com"
+  },
+  "path": {
+    "ui:widget": "text",
+    "ui:autofocus": true,
+    "ui:emptyValue": "",
+    "ui:autocomplete": "e.g. /sql/1.0/endpoints/****************"
+  },
+  "token": {
+    "ui:widget": "password",
+    "ui:autofocus": true,
+    "ui:emptyValue": ""
+  }
 }

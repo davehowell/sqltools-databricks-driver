@@ -7,7 +7,7 @@ const YourDriverPlugin: ILanguageServerPlugin = {
     DRIVER_ALIASES.forEach(({ value }) => {
       server.getContext().drivers.set(value, YourDriver as any);
     });
-  }
-}
+  },
+};
 
 export default YourDriverPlugin;

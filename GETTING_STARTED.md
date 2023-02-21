@@ -1,4 +1,6 @@
-# SQLTools Driver Template Repository
+This extension was created using the [SQLTools Driver Template Repository](https://github.com/mtxr/vsc-sqltools-driver-template) 
+
+...
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y487W9)
 [![Patreon](https://img.shields.io/badge/patreon-support-blue.svg?style=for-the-badge)](https://www.patreon.com/mteixeira)

@@ -1,87 +1,104 @@
-# SQLTools Driver Template Repository
+# SQLTools Databricks Driver
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y487W9)
-[![Patreon](https://img.shields.io/badge/patreon-support-blue.svg?style=for-the-badge)](https://www.patreon.com/mteixeira)
-[![Paypal Donate](https://img.shields.io/badge/paypal-donate-blue.svg?style=for-the-badge)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RSMB6DGK238V8)
-[![VSCode.pro](https://img.shields.io/badge/Supported%20by-VSCode%20Power%20User%20Course%20%E2%86%92-gray.svg?colorA=655BE1&colorB=4F44D6&style=for-the-badge)](https://a.paddle.com/v2/click/16413/111711?link=1227)
+This package depends on the awesome vscode-sqltools extension, [sponsor that project](https://github.com/mtxr/vscode-sqltools).
 
-## Getting started with you new driver
+For installation use Extensions within VSCode, or get it from the VSCode marketplace.
 
-Welcome, developer!
+## About
+[SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) is a fantastic extension that turns VSCode into a feature-rich SQL IDE client. It already supports connections to SQLite, PostgreSQL, MySQL, MSSQL, Snowflake, Redshift, Caddandra, Trino, Teradata and others.
 
-Let's get started with your new driver. I'm assuming you already know how to start extensions on VSCode.
-In case you dont', please take a look at https://code.visualstudio.com/api/get-started/your-first-extension before moving forward.
+The purpose of this Databricks Driver for SQLTools is to extend the capability of SQLTools to support connecting to Databricks SQL Warehouses (formerly called SQL endpoints). It enables browsing the metadata catalog, and supports the editing and running of adhoc and source-controlled `*.sql` files directly with Databricks so they can be tested and source controlled in place.
 
-### 1. Set name, id and description of your driver
 
-In the very beginning let's get this child a name. There are a few places you are required to change, and others are up to you to decide.
+It is not intended to use for connecting with other Databricks cluster types.
 
-- Required changes
+## Alternatives
+The Databricks SQL UI within the Databricks webconsole is a great tool for this purpose and you should consider if that suits your needs.
 
-  - `package.json`, you need to set a this properties as you like to make you package look good on VSCode Marketplace.
-    These are the bare bones of the extension.
+The existing [Databricks VSCode](https://marketplace.visualstudio.com/items?itemName=paiqo.databricks-vscode) extension is also excellent. It utilizes Jupyter notebooks to simulate the Databricks web notebook experience in your local IDE. That is useful for working with notebook files as well as working with clusters, jobs and other admin tasks. This is not intented to replace that extension or compete with that functionality.
 
-  ```
-  "name": "driver-template",
-  "displayName": "Driver Template",
-  "publisher": "mtxr",
-  ```
+## Requirements
+1. A **Databricks account** and workspace with Databricks SQL available
+    1. Requires a "Premium" or higher pricing plan, "Standard" supports neither SQL Warehouses nor tokens.
+2. A personal access **token** (PAT) created in Databricks for your user
+    1. PAT feature may need to be enabled see [tokens](https://docs.databricks.com/administration-guide/access-control/tokens.html)
+3. A **Databricks SQL Warehouse** see [Create a SQL warehouse](https://docs.databricks.com/sql/admin/sql-endpoints.html#create-a-sql-warehouse)
+    1. Ensure the SQL Warehouse is running
+    2. Note the connection details for that SQL Warehouse
+    1. You will need the `host` and `path` as well as your PAT `token` created earlier
+4. VSCode
+5. [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) extension for VSCode
 
-- Optional changes
-  - `src/contants.ts`, you can use different values here if you want
-  - `src/extension.ts`, this is where your driver is bootstraped and attached to SQLTools. You can customize as needed.
+## Setup
 
-You can now go to your terminal emulator and start the extension compiling process with:
+* Install from the VSCode marketplace
 
+## Usage
+* Open the config and enter the `host`, `path` and PAT `token`
+* Test the connection
+    * If there are errors, check the SQL Warehouse is running, and double check the connection details
+    * Other potential connection issues you may check are beyond the responsibility of this extension and could include firewalls, VPN, corporate restrictions, or internet connectivity
+* Usage as per the functionality of SQLTools
+
+## Issues
+Create an issue in this Github repo
+
+## Known limitations
+* Basic authentication with a username and password is intentionally not supported, and will not be supported
+* The Databricks SQL connection has other configurable options including timeout settings, custom ca, cert and key amongst others. These have sensible defaults, but the ability to modify those are currently not supported
+* Downloading large amounts of data and attempting to render it in a table within VSCode is a bad idea. If you run live queries the displayed data will be paged to 1000 rows. This is correct behaviour - trust me you don't want a million rows in your IDE.
+
+#TODO add gif here
+
+## Development
+    The following relates to developing and supporting this VSCode extension, you probably don't want this - just want to install it from the VSCode marketplace
+
+* Read the [VSCode extension docs](https://code.visualstudio.com/api/get-started/your-first-extension)
+* Install:
+    * [Git](https://git-scm.com/)
+    * [Node.js](https://nodejs.org/en/)
+    * [Yarn](https://yarnpkg.com/getting-started/install) i.e. after Node.js is installed just run `corepack enable`
+    * Optional if creating extension from scratch:
+        * Both [Yeoman](https://yeoman.io/) and [generator-code](https://www.npmjs.com/package/generator-code) the VSCode extension generator `npm install -g yo generator-code`
+* Read the [vscode-sqltools docs](https://vscode-sqltools.mteixeira.dev/contributing/support-new-drivers)
+* `F5` to compile and run the extension - at this point add in your connection config
+* #TODO: run the integration tests
+
+Note: the Databricks Driver depends on [databricks-sql-nodejs](https://github.com/databricks/databricks-sql-nodejs) which has examples and more docs that are useful for development purposes.
+
+* Scripts
+```sh
+# lint (es-lint)
+yarn lint
+
+# format (prettier)
+yarn format
+
+# start the extension compiling process
+yarn run watch
 ```
-yarn run watch # or npm run watch
+
+## Changelog
+
+### 0.0.1
+
+- First working version
+
+
+#### notes
+```ts
+import PromisePool from "@supercharge/promise-pool"
+(async function () {
+    try {
+    const list = await getSomeList();
+    const { results, errors } = await PromisePool.withConcurrency(2)
+        .for(listItems)
+        .process(async (data) => {
+        return await getListItem(data.url);
+    });
+    console.log(results.map((p) => p.name));
+    } catch (e) {
+        console.error(e)
+    }
+})();
 ```
-
-For an overview on how to create VScode extensions, refer to VSCode guide at [](https://code.visualstudio.com/api/get-started/your-first-extension).
-
-### 2. Tell SQLTools how to query with you driver
-
-Now we will be updating `src/ls/driver.ts` and `src/ls/queries.ts`. Here is where the magic happens.
-
-`src/ls/driver.ts` is where we do the code to query the desired database, for example, where you would be using `node-pg` to
-guide SQLTools to get Postgres results. Please take a look in the file, there are further comments there.
-
-`src/ls/queries.ts` is the file where your base queries are stored. This file is not required, but having those queries split from `driver.ts`
-help us to keep the code organized.
-
-Check those files and try to update accortdingly to your needs.
-
-### 3. Creating connection schema for the assistant
-
-We are using `@rjsf/core` to render the forms, so in order to add you driver to the connection assistant,
-edit `connection.schema.json` and `ui.schema.json`.
-
-See https://react-jsonschema-form.readthedocs.io/en/latest/ for more instructions.
-
-### 4. Create icons
-
-You should create three icons for your extension to show up correctly on SQLTools with this requirements:
-
-- Must be PNG Images
-- Size 64x64px
-- Have no margins and no paddings
-- Connection state icons:
-  - Connected but not active: 64x64px PNG image, opacity set to 100%. See `icons/default.png`
-  - Connected and active: 64x64px PNG image, opacity set to 100%, have a green (#00FF00) circle 24x24 bottom right. See `icons/active.png`
-  - Diconnected/Inactive icon: Same icon as default state, but with 50% opacity. See `icons/inactive.png`
-- Put your icons at `icons/` directory
-- Ensure your icons are correctly mapped on `src/extension.ts`
-
-### 5. Edit this README
-
-Add instructions for your users about this driver usage, how to get started, how to setup, require etc.
-
-### 6. Publish the driver
-
-Time to publish your driver!
-
-Please refer to https://code.visualstudio.com/api/working-with-extensions/publishing-extension for detailed instructions.
-
-After publishing, open a PR in https://github.com/mtxr/vscode-sqltools to add you driver to the list of supported drivers!
-
-All set! Yay!
