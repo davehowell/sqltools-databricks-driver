@@ -51,7 +51,7 @@ Create an issue in this Github repo
 #TODO add gif here
 
 ## Development
-    The following relates to developing and supporting this VSCode extension, you probably just want to install it from the VSCode marketplace
+    The following relates to developing and supporting this VSCode extension, you probably don't want this - just want to install it from the VSCode marketplace
 
 * Read the [VSCode extension docs](https://code.visualstudio.com/api/get-started/your-first-extension)
 * Install:
@@ -73,6 +73,9 @@ yarn lint
 
 # format (prettier)
 yarn format
+
+# start the extension compiling process
+yarn run watch
 ```
 
 ## Changelog
